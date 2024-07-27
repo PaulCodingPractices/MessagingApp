@@ -1,33 +1,33 @@
 package com.example.messagingapp.service;
 
-import com.example.messagingapp.entity.User;
-import com.example.messagingapp.repository.UserRepository;
+import com.example.messagingapp.entity.AppUser;
+import com.example.messagingapp.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class AppUserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private AppUserRepository appUserRepository;
 
-    public User createUser(String username) {
-        User user = new User(username);
-        return userRepository.save(user);
+    public AppUser createUser(String username) {
+        AppUser appUser = new AppUser(username);
+        return appUserRepository.save(appUser);
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public Optional<AppUser> getUserById(Long id) {
+        return appUserRepository.findById(id);
     }
 
-    public User updateUser(Long id, String newUsername) {
-        Optional<User> userOpt = userRepository.findById(id);
+    public AppUser updateUser(Long id, String newUsername) {
+        Optional<AppUser> userOpt = appUserRepository.findById(id);
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setUsername(newUsername);
-            return userRepository.save(user);
+            AppUser appUser = userOpt.get();
+            appUser.setUsername(newUsername);
+            return appUserRepository.save(appUser);
         }
         return null;
     }

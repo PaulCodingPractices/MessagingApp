@@ -1,14 +1,14 @@
 package com.example.messagingapp.mapping;
 
-import com.example.messagingapp.entity.User;
+import com.example.messagingapp.entity.AppUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface UserMapping {
-    UserMapping INSTANCE = Mappers.getMapper(UserMapping.class);
+public interface AppUserMapping {
+    AppUserMapping INSTANCE = Mappers.getMapper(AppUserMapping.class);
 
-    UserDTO toDTO(User user);
+    AppUserDTO toDTO(AppUser appUser);
 
-    User toEntity(UserDTO userDTO);
+    AppUser toEntity(AppUserDTO appUserDTO);
 }

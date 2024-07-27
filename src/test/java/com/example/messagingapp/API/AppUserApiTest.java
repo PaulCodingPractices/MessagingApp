@@ -1,70 +1,80 @@
 package com.example.messagingapp.API;
 
-import com.example.messagingapp.entity.User;
-import com.example.messagingapp.repository.UserRepository;
-import com.example.messagingapp.mapping.UserDTO;
-import com.example.messagingapp.mapping.UserMapping;
+import com.example.messagingapp.mapping.AppUserDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.MultiValueMap;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.nio.charset.Charset;
+import java.util.Base64;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
 @ActiveProfiles("test")
-class UserApiTest {
+public class AppUserApiTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private UserRepository userRepository;
+    private HttpHeaders createHeaders(String username, String password) {
+        return new HttpHeaders() {{
+            String auth = username + ":" + password;
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(Charset.forName("US-ASCII")));
+            String authHeader = "Basic " + new String(encodedAuth);
+            set("Authorization", authHeader);
+            setContentType(MediaType.APPLICATION_JSON);
+        }};
+    }
 
     @Test
-    void testCreateUser() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername("testuser");
+    public void testCreateUser() {
+        AppUserDTO userDTO = new AppUserDTO();
+        userDTO.setUsername("newuser");
 
-        ResponseEntity<UserDTO> response = restTemplate.postForEntity("/users", userDTO, UserDTO.class);
+        HttpEntity<AppUserDTO> request = new HttpEntity<>(userDTO, createHeaders("testuser", "testpassword"));
+
+        ResponseEntity<AppUserDTO> response = restTemplate.postForEntity("/users", request, AppUserDTO.class);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
-        User savedUser = userRepository.findById(response.getBody().getId()).orElse(null);
-        assertNotNull(savedUser);
-        assertEquals("testuser", savedUser.getUsername());
+        // Additional check to ensure the body is not null and contains the expected username
+        AppUserDTO createdUser = response.getBody();
+        assertNotNull(createdUser, "Created user should not be null");
+        assertEquals("newuser", createdUser.getUsername(), "Username should be 'newuser'");
     }
 
     @Test
-    void testRetrieveUser() {
-        User user = new User();
-        user.setUsername("testuser");
-        User savedUser = userRepository.save(user);
+    public void testRetrieveUser() {
+        HttpEntity<Void> request = new HttpEntity<>(createHeaders("testuser", "testpassword"));
 
-        ResponseEntity<UserDTO> response = restTemplate.getForEntity("/users/" + savedUser.getId(), UserDTO.class);
+        ResponseEntity<AppUserDTO> response = restTemplate.exchange("/users/1", HttpMethod.GET, request, AppUserDTO.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        UserDTO responseBody = response.getBody();
-        assertNotNull(responseBody, "Response body is null");
-        assertEquals("testuser", responseBody.getUsername());
+
+        // Additional check to ensure the body is not null and contains the expected username
+        AppUserDTO retrievedUser = response.getBody();
+        assertNotNull(retrievedUser, "Retrieved user should not be null");
     }
 
     @Test
-    void testUpdateUser() {
-        User user = new User();
-        user.setUsername("testuser");
-        User savedUser = userRepository.save(user);
+    public void testUpdateUser() {
+        AppUserDTO userDTO = new AppUserDTO();
+        userDTO.setUsername("updateduser");
 
-        UserDTO updatedUserDTO = new UserDTO();
-        updatedUserDTO.setUsername("updateduser");
+        HttpEntity<AppUserDTO> request = new HttpEntity<>(userDTO, createHeaders("testuser", "testpassword"));
 
-        restTemplate.put("/users/" + savedUser.getId(), updatedUserDTO);
+        ResponseEntity<Void> updateResponse = restTemplate.exchange("/users/1", HttpMethod.PUT, request, Void.class);
+        assertEquals(HttpStatus.OK, updateResponse.getStatusCode(), "Update response status should be OK");
 
-        User retrievedUser = userRepository.findById(savedUser.getId()).orElse(null);
-        assertNotNull(retrievedUser);
-        assertEquals("updateduser", retrievedUser.getUsername());
+        ResponseEntity<AppUserDTO> getResponse = restTemplate.exchange("/users/1", HttpMethod.GET, new HttpEntity<>(createHeaders("testuser", "testpassword")), AppUserDTO.class);
+        assertEquals(HttpStatus.OK, getResponse.getStatusCode(), "Get response status should be OK");
+
+        AppUserDTO updatedUserDTO = getResponse.getBody();
+        assertNotNull(updatedUserDTO, "Updated user DTO should not be null");
+        assertEquals("updateduser", updatedUserDTO.getUsername(), "Username should be updated to 'updateduser'");
     }
 }

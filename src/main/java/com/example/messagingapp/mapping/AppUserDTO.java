@@ -1,7 +1,11 @@
 package com.example.messagingapp.mapping;
 
-public class UserDTO {
+import jakarta.validation.constraints.NotBlank;
+
+public class AppUserDTO {
     private Long id;
+
+    @NotBlank
     private String username;
 
     // Getters and setters

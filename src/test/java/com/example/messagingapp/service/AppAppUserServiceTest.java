@@ -1,7 +1,7 @@
 package com.example.messagingapp.service;
 
-import com.example.messagingapp.entity.User;
-import com.example.messagingapp.repository.UserRepository;
+import com.example.messagingapp.entity.AppUser;
+import com.example.messagingapp.repository.AppUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,40 +15,40 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-class UserServiceTest {
+class AppAppUserServiceTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private AppUserRepository appUserRepository;
 
     @Test
     void testCreateUser() {
-        User user = new User();
-        user.setUsername("testuser");
-        User savedUser = userRepository.save(user);
-        assertNotNull(savedUser.getId());
+        AppUser appUser = new AppUser();
+        appUser.setUsername("testuser");
+        AppUser savedAppUser = appUserRepository.save(appUser);
+        assertNotNull(savedAppUser.getId());
     }
 
     @Test
     void testRetrieveUser() {
-        User user = new User();
-        user.setUsername("testuser");
-        User savedUser = userRepository.save(user);
+        AppUser appUser = new AppUser();
+        appUser.setUsername("testuser");
+        AppUser savedAppUser = appUserRepository.save(appUser);
 
-        Optional<User> retrievedUser = userRepository.findById(savedUser.getId());
+        Optional<AppUser> retrievedUser = appUserRepository.findById(savedAppUser.getId());
         assertTrue(retrievedUser.isPresent());
         assertEquals("testuser", retrievedUser.get().getUsername());
     }
 
     @Test
     void testUpdateUser() {
-        User user = new User();
-        user.setUsername("testuser");
-        User savedUser = userRepository.save(user);
+        AppUser appUser = new AppUser();
+        appUser.setUsername("testuser");
+        AppUser savedAppUser = appUserRepository.save(appUser);
 
-        savedUser.setUsername("updateduser");
-        User updatedUser = userRepository.save(savedUser);
+        savedAppUser.setUsername("updateduser");
+        AppUser updatedAppUser = appUserRepository.save(savedAppUser);
 
-        Optional<User> retrievedUser = userRepository.findById(updatedUser.getId());
+        Optional<AppUser> retrievedUser = appUserRepository.findById(updatedAppUser.getId());
         assertTrue(retrievedUser.isPresent());
         assertEquals("updateduser", retrievedUser.get().getUsername());
     }

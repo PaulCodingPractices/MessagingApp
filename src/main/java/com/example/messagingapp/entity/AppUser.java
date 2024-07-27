@@ -1,11 +1,9 @@
 package com.example.messagingapp.entity;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-public class User {
+public class AppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +13,10 @@ public class User {
     private String username;
 
     // Constructors, getters, setters
-    public User() {
+    public AppUser() {
     }
 
-    public User(String username) {
+    public AppUser(String username) {
         this.username = username;
     }
 
