@@ -67,6 +67,10 @@ public class AppUserApiTest {
 
         HttpEntity<AppUserDTO> request = new HttpEntity<>(userDTO, createHeaders("testuser", "testpassword"));
 
+        // Ensure the user exists before updating
+        ResponseEntity<AppUserDTO> initialGetResponse = restTemplate.exchange("/users/1", HttpMethod.GET, new HttpEntity<>(createHeaders("testuser", "testpassword")), AppUserDTO.class);
+        assertEquals(HttpStatus.OK, initialGetResponse.getStatusCode(), "Initial get response status should be OK");
+
         ResponseEntity<Void> updateResponse = restTemplate.exchange("/users/1", HttpMethod.PUT, request, Void.class);
         assertEquals(HttpStatus.OK, updateResponse.getStatusCode(), "Update response status should be OK");
 
